@@ -77,7 +77,11 @@ function move() {
     } else if (direction === 'd' || direction === 'D') {
         x1 += 10;
     }
-
+    if (x1 >= canvas.width || x1 < 0 || y1 >= canvas.height || y1 < 10) {
+        // alert("Game ended");
+        location.reload();
+        playing = false; // Set playing to false if snake strikes the boundary
+    }
     snake.pop(); // Remove the last segment of the snake
     snake.unshift({ x: x1, y: y1 }); // Add new head segment to the beginning of the snake
 }
