@@ -15,8 +15,10 @@ let pipes = [];
 let pipePassed = false;
 
 function drawBird() {
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(100, birdY - 10, 20, 20);
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(110, birdY, 10, 0, Math.PI * 2);
+    ctx.fill();
 }
 
 function drawPipe(pipeY, reverse = false) {
@@ -55,6 +57,11 @@ function updatePipe() {
     if (pipeX + pipeWidth > 100 && pipeX < 120 && !pipePassed) {
         score++;
         pipePassed = true;
+    }
+    if (pipes.length > 0 && pipeX < 120 && pipeX + pipeWidth > 100) {
+        if (birdY - 10 > pipes[0].y + pipeGap / 2 || birdY + 10 < pipes[0].y - pipeGap / 2) {
+            score++;
+        }
     }
     if (pipeX + pipeWidth > 100 && pipeX < 120 &&
         (birdY < pipes[0].y - pipeGap / 2 || birdY > pipes[0].y + pipeGap / 2)) {
