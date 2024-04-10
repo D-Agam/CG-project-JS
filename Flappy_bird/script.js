@@ -13,6 +13,7 @@ const pipeWidth = 50;
 const pipeSpeed = 2;
 let pipes = [];
 let pipePassed = false;
+let pipeColor = 'green'; // Initial pipe color
 
 function drawBird() {
     ctx.fillStyle = 'red';
@@ -22,12 +23,11 @@ function drawBird() {
 }
 
 function drawPipe(pipeY, reverse = false) {
+    ctx.fillStyle = pipeColor; // Set pipe color
     if (!reverse) {
-        ctx.fillStyle = 'green';
         ctx.fillRect(pipeX, 0, pipeWidth, pipeY - pipeGap / 2);
         ctx.fillRect(pipeX, pipeY + pipeGap / 2, pipeWidth, canvas.height - pipeY - pipeGap / 2);
     } else {
-        ctx.fillStyle = 'green';
         ctx.fillRect(pipeX, 0, pipeWidth, pipeY - pipeGap / 2);
         ctx.fillRect(pipeX, pipeY + pipeGap / 2, pipeWidth, canvas.height - pipeY - pipeGap / 2);
     }
@@ -57,6 +57,7 @@ function updatePipe() {
     if (pipeX + pipeWidth > 100 && pipeX < 120 && !pipePassed) {
         score++;
         pipePassed = true;
+        changePipeColor(); // Change pipe color when crossing boundary
     }
     if (pipes.length > 0 && pipeX < 120 && pipeX + pipeWidth > 100) {
         if (birdY - 10 > pipes[0].y + pipeGap / 2 || birdY + 10 < pipes[0].y - pipeGap / 2) {
@@ -105,6 +106,19 @@ canvas.addEventListener('click', function (event) {
         velocity = jumpStrength;
     }
 });
+
+function changePipeColor() {
+    pipeColor = getRandomColor(); // Change pipe color to a random color
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 generatePipe();
 gameLoop();
