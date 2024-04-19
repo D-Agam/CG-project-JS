@@ -3,8 +3,8 @@ const ctx = canvas.getContext('2d');
 
 let birdY = canvas.height / 2;
 let velocity = 0;
-const gravity = 0.5;
-const jumpStrength = -10;
+const gravity = 0.2;
+const jumpStrength = -5;
 let gameOver = false;
 let score = 0;
 let pipeX = canvas.width;
@@ -25,12 +25,51 @@ const maxClouds = 5;
 // Generate initial clouds
 generateClouds();
 
-function drawBird() {
-    ctx.fillStyle = 'red';
+function drawWings(dir = 0){
+    
+    ctx.fillStyle = 'blue';
     ctx.beginPath();
-    ctx.arc(110, birdY, 10, 0, Math.PI * 2);
+    if (dir == 1){
+        ctx.arc(105, birdY, 10, 0, Math.PI, true); 
+    }
+    else {
+        ctx.arc(105, birdY, 10, 0, Math.PI, false); 
+    }
     ctx.fill();
+
 }
+
+function drawBird() {
+    // Body
+    ctx.fillStyle = 'gray';
+    ctx.beginPath();
+    ctx.arc(110, birdY, 20, 0, Math.PI, false); 
+    ctx.fill();
+    
+    // Head
+    ctx.fillStyle = 'gray';
+    ctx.beginPath();
+    ctx.arc(125, birdY, 10, 10, Math.PI, false); 
+    ctx.fill();
+    // Tail
+    ctx.fillStyle = 'gray';
+    ctx.beginPath();
+    ctx.moveTo(95, birdY + 3);
+    ctx.lineTo(80, birdY - 7);
+    ctx.lineTo(80, birdY + 13);
+    ctx.closePath();
+    ctx.fill();
+  
+    // Beak
+    ctx.fillStyle = 'gray';
+    ctx.beginPath();
+    ctx.moveTo(140, birdY);
+    ctx.lineTo(130, birdY - 7);
+    ctx.lineTo(130, birdY + 7);
+    ctx.closePath();
+    ctx.fill();
+
+  }
 
 function drawPipe(pipeY, reverse = false) {
     ctx.fillStyle = pipeColor; // Set pipe color
@@ -54,6 +93,12 @@ function updateBird() {
     birdY += velocity;
     if (birdY > canvas.height || birdY < 0) {
         gameOver = true;
+    }  
+    if (velocity >= 0) {
+        drawWings(1);
+    }
+    else {
+        drawWings();
     }
 }
 
@@ -95,6 +140,7 @@ function generateClouds() {
     }
 }
 
+
 function moveClouds() {
     for (let i = 0; i < clouds.length; i++) {
         clouds[i].x += cloudSpeed;
@@ -105,6 +151,23 @@ function moveClouds() {
     }
 }
 
+// function drawClouds() {
+//     for (let i = 0; i < clouds.length; i++) {
+
+//         const cloudGradient = ctx.createRadialGradient(
+//             clouds[i].x, clouds[i].y, 0,
+//             clouds[i].x, clouds[i].y, clouds[i].size
+//         );
+//         cloudGradient.addColorStop(0, 'white');
+//         cloudGradient.addColorStop(1, 'lightgray');
+
+//         ctx.fillStyle = cloudGradient;
+//         ctx.beginPath();
+//         ctx.ellipse(clouds[i].x, clouds[i].y, clouds[i].size, clouds[i].size / 2, 0, 0, Math.PI * 2);
+//         ctx.closePath();
+//         ctx.fill();
+//     }
+// }
 function drawClouds() {
     for (let i = 0; i < clouds.length; i++) {
         const cloudGradient = ctx.createRadialGradient(
@@ -116,7 +179,26 @@ function drawClouds() {
 
         ctx.fillStyle = cloudGradient;
         ctx.beginPath();
+        // Draw the main ellipse
         ctx.ellipse(clouds[i].x, clouds[i].y, clouds[i].size, clouds[i].size / 2, 0, 0, Math.PI * 2);
+        
+        // Draw a smaller ellipse
+        ctx.ellipse(clouds[i].x, clouds[i].y, clouds[i].size * 0.8, clouds[i].size * 0.4, 0, 0, Math.PI * 2);
+
+        // Draw circles around the larger ellipse
+        const numCircles = 5;
+        const circleRadius = clouds[i].size * 0.3;
+        for (let j = 0; j < numCircles; j++) {
+            const angle = (j / numCircles) * Math.PI * 2;
+            const x = clouds[i].x + Math.cos(angle) * circleRadius;
+            const y = clouds[i].y + Math.sin(angle) * circleRadius;
+            const distanceX = Math.abs(x - clouds[i].x) / (clouds[i].size * 0.6);
+            const distanceY = Math.abs(y - clouds[i].y) / (clouds[i].size * 0.2);
+            const diameter = (distanceX > distanceY) ? clouds[i].size * 0.8 : clouds[i].size;
+            ctx.moveTo(x + diameter / 2, y);
+            ctx.arc(x, y, diameter / 2, 0, Math.PI * 2);
+        }
+
         ctx.closePath();
         ctx.fill();
     }
@@ -168,6 +250,7 @@ function getRandomColor() {
     }
     return color;
 }
+
 
 generatePipe();
 gameLoop();
