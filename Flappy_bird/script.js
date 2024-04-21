@@ -26,7 +26,6 @@ const maxClouds = 5;
 generateClouds();
 
 function drawWings(dir = 0){
-    
     ctx.fillStyle = 'blue';
     ctx.beginPath();
     if (dir == 1){
@@ -36,7 +35,6 @@ function drawWings(dir = 0){
         ctx.arc(105, birdY, 10, 0, Math.PI, false); 
     }
     ctx.fill();
-
 }
 
 function drawBird() {
@@ -51,6 +49,7 @@ function drawBird() {
     ctx.beginPath();
     ctx.arc(125, birdY, 10, 10, Math.PI, false); 
     ctx.fill();
+    
     // Tail
     ctx.fillStyle = 'gray';
     ctx.beginPath();
@@ -68,8 +67,7 @@ function drawBird() {
     ctx.lineTo(130, birdY + 7);
     ctx.closePath();
     ctx.fill();
-
-  }
+}
 
 function drawPipe(pipeY, reverse = false) {
     ctx.fillStyle = pipeColor; // Set pipe color
@@ -112,7 +110,6 @@ function updatePipe() {
     if (pipeX + pipeWidth > 100 && pipeX < 120 && !pipePassed) {
         score++;
         pipePassed = true;
-        changePipeColor(); // Change pipe color when crossing boundary
     }
     if (pipes.length > 0 && pipeX < 120 && pipeX + pipeWidth > 100) {
         if (birdY - 10 > pipes[0].y + pipeGap / 2 || birdY + 10 < pipes[0].y - pipeGap / 2) {
@@ -123,8 +120,24 @@ function updatePipe() {
         (birdY < pipes[0].y - pipeGap / 2 || birdY > pipes[0].y + pipeGap / 2)) {
         gameOver = true;
     }
+
+    // Check if the pipe is completely out of the canvas before changing color
+    if (pipeX < 0) {
+        changePipeColor();
+    }
 }
 
+function drawSun() {
+    // Define sun properties
+    const sunRadius = 50;
+    const sunColor = '#FDB813';
+
+    // Draw sun
+    ctx.fillStyle = sunColor;
+    ctx.beginPath();
+    ctx.arc(canvas.width - 200, 70, sunRadius, 0, Math.PI * 2);
+    ctx.fill();
+}
 function generatePipe() {
     const y = Math.floor(Math.random() * (canvas.height - pipeGap)) + pipeGap / 2;
     pipes.push({ y });
@@ -144,30 +157,18 @@ function generateClouds() {
 function moveClouds() {
     for (let i = 0; i < clouds.length; i++) {
         clouds[i].x += cloudSpeed;
-        if (clouds[i].x > canvas.width) {
-            clouds[i].x = -cloudWidth;
+        if (clouds[i].x + cloudWidth < 0) { // Check if the endmost point of the cloud is outside the canvas
+            clouds[i].x = canvas.width; // Reset the cloud position to the right side of the canvas
+            clouds[i].y = Math.random() * (canvas.height - cloudHeight);
+        }
+        if (clouds[i].x > canvas.width) { // Check if the endmost point of the cloud has reached the canvas width
+            clouds[i].x = -cloudWidth; // Reset the cloud position to the left side of the canvas
             clouds[i].y = Math.random() * (canvas.height - cloudHeight);
         }
     }
 }
 
-// function drawClouds() {
-//     for (let i = 0; i < clouds.length; i++) {
 
-//         const cloudGradient = ctx.createRadialGradient(
-//             clouds[i].x, clouds[i].y, 0,
-//             clouds[i].x, clouds[i].y, clouds[i].size
-//         );
-//         cloudGradient.addColorStop(0, 'white');
-//         cloudGradient.addColorStop(1, 'lightgray');
-
-//         ctx.fillStyle = cloudGradient;
-//         ctx.beginPath();
-//         ctx.ellipse(clouds[i].x, clouds[i].y, clouds[i].size, clouds[i].size / 2, 0, 0, Math.PI * 2);
-//         ctx.closePath();
-//         ctx.fill();
-//     }
-// }
 function drawClouds() {
     for (let i = 0; i < clouds.length; i++) {
         const cloudGradient = ctx.createRadialGradient(
@@ -186,7 +187,7 @@ function drawClouds() {
         ctx.ellipse(clouds[i].x, clouds[i].y, clouds[i].size * 0.8, clouds[i].size * 0.4, 0, 0, Math.PI * 2);
 
         // Draw circles around the larger ellipse
-        const numCircles = 5;
+        const numCircles = 6;
         const circleRadius = clouds[i].size * 0.3;
         for (let j = 0; j < numCircles; j++) {
             const angle = (j / numCircles) * Math.PI * 2;
@@ -195,7 +196,7 @@ function drawClouds() {
             const distanceX = Math.abs(x - clouds[i].x) / (clouds[i].size * 0.6);
             const distanceY = Math.abs(y - clouds[i].y) / (clouds[i].size * 0.2);
             const diameter = (distanceX > distanceY) ? clouds[i].size * 0.8 : clouds[i].size;
-            ctx.moveTo(x + diameter / 2, y);
+            ctx.moveTo(x +diameter , y);
             ctx.arc(x, y, diameter / 2, 0, Math.PI * 2);
         }
 
@@ -207,6 +208,7 @@ function drawClouds() {
 function gameLoop() {
     if (!gameOver) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawSun();
         drawClouds(); // Draw clouds
         drawBird();
         pipes.forEach(pipe => drawPipe(pipe.y));
@@ -250,7 +252,6 @@ function getRandomColor() {
     }
     return color;
 }
-
 
 generatePipe();
 gameLoop();
