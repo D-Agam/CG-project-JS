@@ -107,14 +107,9 @@ function updatePipe() {
         pipePassed = false;
         pipes.shift();
     }
-    if (pipeX + pipeWidth > 100 && pipeX < 120 && !pipePassed) {
+    if (pipeX < 80 && !pipePassed) {
         score++;
         pipePassed = true;
-    }
-    if (pipes.length > 0 && pipeX < 120 && pipeX + pipeWidth > 100) {
-        if (birdY - 10 > pipes[0].y + pipeGap / 2 || birdY + 10 < pipes[0].y - pipeGap / 2) {
-            score++;
-        }
     }
     if (pipeX + pipeWidth > 100 && pipeX < 120 &&
         (birdY < pipes[0].y - pipeGap / 2 || birdY > pipes[0].y + pipeGap / 2)) {
